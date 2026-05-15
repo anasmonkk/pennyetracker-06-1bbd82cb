@@ -62,7 +62,7 @@ function Locations() {
 }
 
 function Column({
-  title, table, parentField, parentId, selectedId, onSelect, extraField,
+  title, table, parentField, parentId, selectedId, onSelect, extraField, bulkAdd,
 }: {
   title: string;
   table: "states" | "districts" | "panchayaths" | "wards";
