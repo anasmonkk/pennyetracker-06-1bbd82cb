@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bike, MapPin, User, Phone, Home } from "lucide-react";
+import { Bike, MapPin, User, Phone, Home, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/delivery-partners")({
@@ -78,35 +79,9 @@ function DeliveryPartnersPage() {
                   </div>
                 </div>
 
-                <div className={`mt-2 grid gap-3 rounded-xl ${c.card} p-3 sm:grid-cols-2 lg:grid-cols-3`}>
+                <div className={`mt-2 grid gap-2 rounded-xl ${c.card} p-3 sm:grid-cols-2 lg:grid-cols-3`}>
                   {g.partners.map((p) => (
-                    <div key={p.id} className="rounded-lg bg-white/80 p-3 shadow-sm ring-1 ring-black/5">
-                      <div className="flex items-center gap-2">
-                        <User className={`h-4 w-4 ${c.icon}`} />
-                        <span className="font-medium truncate">{p.full_name}</span>
-                      </div>
-                      <a href={`tel:${p.phone}`} className="mt-1.5 flex items-center gap-2 text-sm hover:underline">
-                        <Phone className={`h-4 w-4 ${c.icon}`} />
-                        <span>{p.phone}</span>
-                      </a>
-                      {p.alt_phone && (
-                        <a href={`tel:${p.alt_phone}`} className="mt-1 flex items-center gap-2 text-sm hover:underline">
-                          <Phone className={`h-4 w-4 ${c.icon}`} />
-                          <span>{p.alt_phone}</span>
-                        </a>
-                      )}
-                      {p.wards.length > 0 && (
-                        <div className="mt-1.5 flex items-start gap-2 text-sm">
-                          <Home className={`mt-0.5 h-4 w-4 shrink-0 ${c.icon}`} />
-                          <div>
-                            <span className="text-muted-foreground">Wards: </span>
-                            <span className="font-medium">
-                              {p.wards.map((w) => w.ward_number ?? w.name).join(", ")}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <PartnerCard key={p.id} partner={p} colors={c} />
                   ))}
                 </div>
               </section>
