@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -47,6 +47,8 @@ export type GraphConfig = {
   };
   /** Extra display under node name */
   subtitle?: (node: any) => string | null;
+  /** Optional scoping filter, e.g. only show wards belonging to a panchayath */
+  filter?: { key: string; value: string } | null;
 };
 
 const DIRS: Direction[] = ["north", "south", "east", "west"];
@@ -102,14 +104,23 @@ export function GraphCanvas({ cfg }: { cfg: GraphConfig }) {
   const [search, setSearch] = useState("");
   const [dialog, setDialog] = useState<{ kind: "add" | "connect" | "create"; dir?: Direction } | null>(null);
 
+  // Reset selection when scoping filter changes
+  useEffect(() => {
+    setCenterId(null);
+    setSearch("");
+  }, [cfg.filter?.value]);
+
   // All nodes (for search and existing selection)
   const { data: allNodes = [] } = useQuery({
-    queryKey: [cfg.nodesTable, "all"],
+    queryKey: [cfg.nodesTable, "all", cfg.filter?.key, cfg.filter?.value],
     queryFn: async () => {
-      const { data, error } = await supabase.from(cfg.nodesTable).select("*").order("name");
+      let q = supabase.from(cfg.nodesTable).select("*").order("name");
+      if (cfg.filter) q = q.eq(cfg.filter.key, cfg.filter.value);
+      const { data, error } = await q;
       if (error) throw error;
       return data as any[];
     },
+    enabled: cfg.filter ? !!cfg.filter.value : true,
   });
 
   // Connections from current center
