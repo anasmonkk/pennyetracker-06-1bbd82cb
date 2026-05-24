@@ -6,12 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
-const staffPhoneToEmail = (value: string) => {
-  const digits = value.replace(/\D/g, "");
-  if (!digits) throw new Error("Enter a valid mobile number");
-  return `staff-${digits}@staff.penny-etracker.local`;
-};
-
 export const Route = createFileRoute("/staff/login")({
   component: StaffLoginPage,
   head: () => ({ meta: [{ title: "Staff Sign In — Penny-eTracker" }] }),
@@ -29,9 +23,17 @@ function StaffLoginPage() {
     setErr(null);
     setLoading(true);
     try {
-      const email = staffPhoneToEmail(phone);
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.functions.invoke("staff-login", {
+        body: { phone, password },
+      });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (!data?.session) throw new Error("Sign-in failed");
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      if (sessionError) throw sessionError;
       const uid = data.user?.id;
       if (!uid) throw new Error("Sign-in failed");
       const { data: roles, error: rolesError } = await supabase.from("user_roles").select("role").eq("user_id", uid);
