@@ -60,7 +60,7 @@ function Landing() {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/staff/login" });
       return;
     }
     if (isAdmin) return;
@@ -92,10 +92,10 @@ function Landing() {
               <Link to="/delivery-partners">Partners</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link to="/auth">Get Started</Link>
+              <Link to="/staff/login">Staff Login</Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/staff/login">Staff</Link>
+              <Link to="/auth">Admin Login</Link>
             </Button>
           </div>
         </div>
